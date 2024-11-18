@@ -9,26 +9,32 @@ const Events: NextPage = () => {
   const { data: EthToTokenEvents, isLoading: isEthToTokenEventsLoading } = useScaffoldEventHistory({
     contractName: "DEX",
     eventName: "EthToTokenSwap",
-    fromBlock: 0n,
+    fromBlock: 7104389n,
   });
 
   const { data: tokenToEthEvents, isLoading: isTokenToEthEventsLoading } = useScaffoldEventHistory({
     contractName: "DEX",
     eventName: "TokenToEthSwap",
-    fromBlock: 0n,
+    fromBlock: 7104389n,
   });
 
   const { data: liquidityProvidedEvents, isLoading: isLiquidityProvidedEventsLoading } = useScaffoldEventHistory({
     contractName: "DEX",
     eventName: "LiquidityProvided",
-    fromBlock: 0n,
+    fromBlock: 7104389n,
   });
 
   const { data: liquidityRemovedEvents, isLoading: isLiquidityRemovedEventsLoading } = useScaffoldEventHistory({
     contractName: "DEX",
     eventName: "LiquidityRemoved",
-    fromBlock: 0n,
+    fromBlock: 7104389n,
   });
+
+  const { data: approvalEvents, isLoading: isApprovalEventsLoading } = useScaffoldEventHistory({
+    contractName: "Balloons",  
+    eventName: "Approval",
+    fromBlock: 7104389n,
+});
 
   return (
     <>
@@ -166,6 +172,53 @@ const Events: NextPage = () => {
             </div>
           </div>
         )}
+
+{isApprovalEventsLoading ? (
+  <div className="flex justify-center items-center mt-10">
+    <span className="loading loading-spinner loading-lg"></span>
+  </div>
+) : (
+  <div className="mt-8 mb-8">
+    <div className="text-center mb-4">
+      <span className="block text-2xl font-bold">Token Approval Events</span>
+    </div>
+    <div className="overflow-x-auto shadow-lg mb-5">
+      <table className="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th className="bg-primary">Owner</th>
+            <th className="bg-primary">Spender</th>
+            <th className="bg-primary">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {!approvalEvents || approvalEvents.length === 0 ? (
+            <tr>
+              <td colSpan={3} className="text-center">
+                No events found
+              </td>
+            </tr>
+          ) : (
+            approvalEvents?.map((event, index) => {
+              return (
+                <tr key={index}>
+                  <td className="text-center">
+                    <Address address={event.args.owner} />
+                  </td>
+                  <td className="text-center">
+                    <Address address={event.args.spender} />
+                  </td>
+                  <td>{parseFloat(formatEther(event.args.value || 0n)).toFixed(4)}</td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
 
         {isLiquidityRemovedEventsLoading ? (
           <div className="flex justify-center items-center mt-10">
